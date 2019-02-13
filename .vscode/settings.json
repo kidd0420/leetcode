@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.mip": "mips",
+        "*.ld": "ini",
+        "*.gpj": "muchassemblyrequired",
+        "stdbool.h": "c"
+    }
+}

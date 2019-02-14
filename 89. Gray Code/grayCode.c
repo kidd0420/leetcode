@@ -29,7 +29,7 @@ int* grayCode(int n, int* returnSize) {
 
 		tmp_value = value ^ curridx;
 
-		while (tmp_value != 0) {
+		while ((tmp_value != 0) || (one_count <= 1)) {
 			one_count += tmp_value & 0x1;
 			tmp_value = tmp_value >> 1;
 		}
@@ -62,6 +62,8 @@ int main ()
     scanf("%d", &input);
 
 	output = grayCode(input, &size);
+
+    printf("Data %d, Length: %d\n", input, size);
 
     printf("[");
 

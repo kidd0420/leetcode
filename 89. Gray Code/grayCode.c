@@ -15,8 +15,9 @@ int* grayCode(int n, int* returnSize) {
     output[0] = 0;
 
     for (int i = 0; i < n; i++) {
-        for (int j = (1 << i), m = 1; j < (1 << (i + 1)); j++, m++) {
-            output[j] = (1 << i) | output[(1 << i) - m];
+        int k = (1 << i);
+        for (int j = k, m = 1; j < (1 << (i + 1)); j++, m++) {
+            output[j] = k | output[k - m];
         }
     }
 

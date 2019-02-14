@@ -7,7 +7,9 @@ bool judgeSquareSum(int c) {
     int max = 1;
 	int sum = c;
 
-    if (c <= 5)
+    if (c == 3)
+		return 0;
+	else if (c <= 5)
 		return 1;
 
 	while (1) {
@@ -34,13 +36,11 @@ bool judgeSquareSum(int c) {
 
 	base_a = max;
 	sum = c - (base_a * base_a);
-
-	if (sum == base_a * base_a) {
-		return 1;
-	}
 	
 	while (1) {
-		if (c - (base_a * base_a) > (base_a - 1) * (base_a - 1)) {
+		if (sum == base_a * base_a) {
+			return 1;
+		} else if (c - (base_a * base_a) > (base_a - 1) * (base_a - 1)) {
 			return 0;
 		}
 

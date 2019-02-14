@@ -11,11 +11,17 @@ bool judgeSquareSum(int c) {
 		return 1;
 
 	while (1) {
+		//printf("max: %d\n", max);
 		if (c > max * max) {
 			if (c < (max + 1) * (max + 1)) {
 				break;
 			} else if (c > (max + 1) * (max + 1)) {
-				max = max << 1;
+				if (max < 32768)
+					max = max << 1;
+				else {
+					max = 46340;
+					break;
+				}		
 			} else {
 				return 1;
 			}
@@ -39,12 +45,16 @@ bool judgeSquareSum(int c) {
 		}
 
 		while (1) {
+			//printf("base_b: %d\n", base_b);
 			if (sum > base_b * base_b) {
 				if (sum < (base_b + 1) * (base_b + 1)) {
 					break;
 				} else if (sum > (base_b + 1) * (base_b + 1)) {
                     if (base_a > base_b * base_b) {
-				        base_b = base_b << 1;
+						if (base_b < 32768)
+							base_b = base_b << 1;
+						else
+							base_b = 46340;
                     } else {
                         base_b = base_a - 1;
                     }
@@ -61,6 +71,7 @@ bool judgeSquareSum(int c) {
                 return 0;
 		}
 
+		base_b = 1;
 		base_a--;
 		sum = c - (base_a * base_a);
 

@@ -5,19 +5,17 @@
 bool judgeSquareSum(int c) {
 	int base_a = 1, base_b = 1;
     int max = 1;
-    int shift = 0;
 	int sum = c;
 
-    if (c <= 1)
-		return 0;
+    if (c <= 5)
+		return 1;
 
 	while (1) {
 		if (c > max * max) {
 			if (c < (max + 1) * (max + 1)) {
 				break;
 			} else if (c > (max + 1) * (max + 1)) {
-                shift++;
-				max = max << shift;
+				max = max << 1;
 			} else {
 				return 1;
 			}
@@ -30,7 +28,10 @@ bool judgeSquareSum(int c) {
 
 	base_a = max;
 	sum = c - (base_a * base_a);
-    shift = 0;
+
+	if (sum == base_a * base_a) {
+		return 1;
+	}
 	
 	while (1) {
 		if (c - (base_a * base_a) > (base_a - 1) * (base_a - 1)) {
@@ -43,8 +44,7 @@ bool judgeSquareSum(int c) {
 					break;
 				} else if (sum > (base_b + 1) * (base_b + 1)) {
                     if (base_a > base_b * base_b) {
-                        shift++;
-				        base_b = base_b << shift;
+				        base_b = base_b << 1;
                     } else {
                         base_b = base_a - 1;
                     }
@@ -63,7 +63,6 @@ bool judgeSquareSum(int c) {
 
 		base_a--;
 		sum = c - (base_a * base_a);
-        shift = 0;
 
         if (base_a < 1)
             return 0;

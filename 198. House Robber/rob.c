@@ -22,13 +22,16 @@ Explanation: Rob house 1 (money = 2), rob house 3 (money = 9) and rob house 5 (m
 */
 #include "stdio.h"
 #include <stdlib.h>
+#include <string.h>
 
 int rob(int* nums, int numsSize) {
     int *add_nums;
 	int i,j;
 	int tmp_num;
 
-	if (numsSize == 1) {
+    if (numsSize == 0) {
+        return 0;
+	} else if (numsSize == 1) {
 		return nums[0];
 	} else if (numsSize == 2) {
 		if (nums[0] > nums[1])
@@ -38,7 +41,7 @@ int rob(int* nums, int numsSize) {
 	}
 
 	add_nums = malloc(sizeof(int) * numsSize);
-	memset(add_nums, 0, sizeof(int) * numsSize);
+	memcpy(add_nums, nums, sizeof(int) * numsSize);
 
 	for (i = 0; i < numsSize - 2; i++) {
 		for (j = 2; j < 4; j++) {

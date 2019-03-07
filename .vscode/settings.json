@@ -3,6 +3,7 @@
         "*.mip": "mips",
         "*.ld": "ini",
         "*.gpj": "muchassemblyrequired",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "stdio.h": "c"
     }
 }

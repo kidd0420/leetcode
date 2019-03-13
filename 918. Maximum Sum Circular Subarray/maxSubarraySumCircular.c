@@ -44,19 +44,36 @@ Note:
 #include <stdlib.h>
 #include <string.h>
 
+#define Max(a,b)    (a > b)?a:b
+#define Min(a,b)    (a < b)?a:b
+
+
 int maxSubarraySumCircular(int* A, int ASize) {
-    
+    int i;
+    int total = 0;
+    int maxSum = -30000, minSum = 30000;
+    int curMax = 0, curMin = 0;
+
+    for (i = 0; i < ASize; i++) {
+        curMax = Max(curMax + A[i], A[i]);
+        maxSum = Max(maxSum, curMax);
+        curMin = Min(curMin + A[i], A[i]);
+        minSum = Min(minSum, curMin);
+        total += A[i];
+    }
+
+    return maxSum > 0 ? Max(maxSum, total - minSum) : maxSum;
 }
 
 
-    int maxSubarraySumCircular(vector<int>& A) {
-        int total = 0, maxSum = -30000, curMax = 0, minSum = 30000, curMin = 0;
-        for (int a : A) {
-            curMax = max(curMax + a, a);
-            maxSum = max(maxSum, curMax);
-            curMin = min(curMin + a, a);
-            minSum = min(minSum, curMin);
-            total += a;
-        }
-        return maxSum > 0 ? max(maxSum, total - minSum) : maxSum;
-    }
+int main ()
+{
+    int A[4] = {5,-3,8,5};
+    int max;
+    
+    max = maxSubarraySumCircular(A, 4);
+
+    printf("Max: %d\n", max);
+
+    return 0;
+}

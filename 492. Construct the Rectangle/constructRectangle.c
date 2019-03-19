@@ -33,12 +33,17 @@
 #include <stdlib.h>
 
 int* constructRectangle(int area, int* returnSize) {
-    static int a[2] = {100000001,1};
+    int *a;
 	int tmp;
     int count = 1;
 
-	if ((area > 10000000) || (area <= 0))
+	if (area <= 0)
 		return 0;
+
+    a = malloc(sizeof(int) * 2);
+
+    a[0] = 10000001;
+    a[1] = 1;
 
 	*returnSize = 2;
 

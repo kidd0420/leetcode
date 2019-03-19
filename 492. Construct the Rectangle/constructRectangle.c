@@ -29,6 +29,50 @@
  * Return an array of size *returnSize.
  * Note: The returned array must be malloced, assume caller calls free().
  */
+#include "stdio.h"
+#include <stdlib.h>
+
 int* constructRectangle(int area, int* returnSize) {
-    
+    static int a[2] = {100000001,1};
+	int tmp;
+    int count = 1;
+
+	if ((area > 10000000) || (area <= 0))
+		return 0;
+
+	*returnSize = 2;
+
+	while (count * count <= area) {
+		if (area % count == 0) {
+            a[1] = count;
+			tmp = area / a[1];
+
+			if (abs(tmp - a[1]) < abs(a[0] - a[1]))
+				a[0] = tmp;
+		}
+
+        count++;
+	}
+
+	if (a[0] < a[1]) {
+		tmp = a[0];
+		a[0] = a[1];
+		a[1] = tmp;
+	}
+
+	return a;
+}
+
+
+int main ()
+{
+    int area = 500;
+    int* ans;
+    int size;
+
+    ans = constructRectangle(area, &size);
+
+    printf("ans: [%d,%d]\n", ans[0], ans[1]);
+
+    return 0;
 }

@@ -116,8 +116,10 @@ void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int val) {
 
 	if (index > g_Total)
 		return;
-	else if (index == g_Total)
+	else if (index == g_Total) {
 		myLinkedListAddAtTail(obj, val);
+        return;
+    }
 
 	new = malloc(sizeof(MyLinkedList));
 

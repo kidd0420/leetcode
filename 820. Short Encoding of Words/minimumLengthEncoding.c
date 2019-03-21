@@ -33,7 +33,11 @@ int CompareString(char* str_a, char* str_b)
 	int i;
     int min_num = min(len_a, len_b);
 
+    printf("len_a: %d\n", len_a);
+    printf("len_b: %d\n", len_b);
+
 	for (i = 1; i <= min_num; i++) {
+        printf("i: %d\n", i);
 		if (str_a[len_a - i] != str_b[len_b - i])
 			return 0;	//String a and b are difference string
 	}
@@ -70,22 +74,22 @@ int minimumLengthEncoding(char** words, int wordsSize) {
     			break;
     		}
 
-    		if (remove_flag[i])
+    		if (remove_flag[j])
     			continue;
 
     		used++;
 
     		stat = CompareString(words[i], words[j]);
 
-            //printf("stat: %d\n", stat);
+            printf("stat: %d\n", stat);
 
     		if (stat == 1) {
-    			remove_flag[i] = 1;
+    			remove_flag[j] = 1;
                 sum += strlen(words[i]);
                 sum -= strlen(words[j]);
     			break;
     		} else if (stat == 2) {
-    			remove_flag[j] = 1;
+    			remove_flag[i] = 1;
     			break;
     		}
     	}
@@ -102,8 +106,8 @@ int main()
 {
     char **input;
     char input_0[8] = "me";
-    char input_1[8] = "time";
-    char input_2[8] = "bell";
+    char input_1[8] = "timeg";
+    char input_2[8] = "g";
 
     int sum;
 

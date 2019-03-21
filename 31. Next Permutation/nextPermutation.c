@@ -39,7 +39,7 @@ void Reorder(int* nums, int numsSize, int idx) {
 	} else {
 		int i;
 
-		for (i = numsSize - 1; i > idx; i--) {
+		for (i = numsSize - 1; i >= idx; i--) {
 			if (nums[idx - 1] < nums[i]) {
 				tmp = nums[i];
 				nums[i] = nums[idx - 1];
@@ -88,7 +88,7 @@ void ShowArray(int* nums, int numsSize)
 
 int main ()
 {
-    int input[6] = {5,4,4,4,2,1};
+    int input[3] = {1,5,1};
     int size = sizeof(input) / sizeof(int);
 
     ShowArray(input, size);

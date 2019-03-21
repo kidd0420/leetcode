@@ -34,43 +34,138 @@
  * The number of operations will be in the range of [1, 1000].
  * Please do not use the built-in LinkedList library.
  ***************************************************************************************/
+#include <stdio.h>
+#include <stdlib.h>
 
-typedef struct {
-    
+typedef struct LinkedList {
+	int Value;
+	struct LinkedList *Next;
 } MyLinkedList;
+
+static int g_Total;
+static MyLinkedList* Tail_List;
+
 
 /** Initialize your data structure here. */
 MyLinkedList* myLinkedListCreate() {
-    
+	MyLinkedList* start = malloc(sizeof(MyLinkedList));
+
+	start->Value = 0;
+	start->Next = NULL;
+
+	g_Total = 0;
+	Tail_List = start;
+
+	return start;
 }
 
-/** Get the value of the index-th node in the linked list. If the index is invalid, return -1. */
+/** Get the value of the index-th node in the linked list.
+ * If the index is invalid, return -1. */
 int myLinkedListGet(MyLinkedList* obj, int index) {
-    
+	int i;
+	MyLinkedList *loc = obj;
+
+	if (index > g_Total - 1)
+		return -1;
+
+	for (i = 0; i < index + 1; i++) {
+		loc = loc->Next;
+	}
+
+	return loc->Value;
 }
 
-/** Add a node of value val before the first element of the linked list. After the insertion, the new node will be the first node of the linked list. */
+/** Add a node of value val before the first element of the linked list.
+ * After the insertion, the new node will be the first node of the linked list. */
 void myLinkedListAddAtHead(MyLinkedList* obj, int val) {
-    
+	MyLinkedList *new = malloc(sizeof(MyLinkedList));
+
+	new->Value = val;
+
+	if (obj->Next != NULL)
+		new->Next = obj->Next;
+
+	obj->Next = new;
+
+	if (g_Total == 0)	//Only start link (No any valid link)
+		Tail_List = new;
+
+	g_Total++;
 }
 
 /** Append a node of value val to the last element of the linked list. */
 void myLinkedListAddAtTail(MyLinkedList* obj, int val) {
-    
+	MyLinkedList *new = malloc(sizeof(MyLinkedList));
+
+    obj = obj;
+	new->Value = val;
+
+	Tail_List->Next = new;
+	Tail_List = new;
+
+	g_Total++;
 }
 
-/** Add a node of value val before the index-th node in the linked list. If index equals to the length of linked list, the node will be appended to the end of linked list. If index is greater than the length, the node will not be inserted. */
+/** Add a node of value val before the index-th node in the linked list.
+ * If index equals to the length of linked list, the node will be appended to the end of linked list.
+ * If index is greater than the length, the node will not be inserted. */
 void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int val) {
-    
+	int i;
+	MyLinkedList *new;
+	MyLinkedList *loc = obj;
+
+	if (index > g_Total)
+		return;
+	else if (index == g_Total)
+		myLinkedListAddAtTail(obj, val);
+
+	new = malloc(sizeof(MyLinkedList));
+
+	for (i = 0; i < index; i++)
+		loc = loc->Next;
+
+	new->Value = val;
+	new->Next = loc->Next;
+
+	loc->Next = new;
+	g_Total++;
 }
 
 /** Delete the index-th node in the linked list, if the index is valid. */
 void myLinkedListDeleteAtIndex(MyLinkedList* obj, int index) {
-    
+	int i;
+	MyLinkedList *loc = obj;
+	MyLinkedList *free_list;
+
+	if (index > g_Total - 1)
+		return;
+
+	for (i = 0; i < index; i++)
+		loc = loc->Next;
+
+	free_list = loc->Next;
+
+	if (index == g_Total - 1) {
+		Tail_List = loc;
+		loc->Next = NULL;
+	} else {
+		loc->Next = loc->Next->Next;
+	}
+
+	free(free_list);
+	g_Total--;
 }
 
 void myLinkedListFree(MyLinkedList* obj) {
-    
+	int i;
+	MyLinkedList *remove = obj;
+	MyLinkedList *next;
+
+	for (i = 0; i < g_Total + 1; i++) {
+		next = remove->Next;
+		free(remove);
+		remove = next;
+	}
 }
 
 /**
@@ -83,3 +178,29 @@ void myLinkedListFree(MyLinkedList* obj) {
  * myLinkedListDeleteAtIndex(obj, index);
  * myLinkedListFree(obj);
  */
+
+int main ()
+{
+    MyLinkedList* list;
+    int val;
+    int idx;
+    
+    list = myLinkedListCreate();
+
+    myLinkedListAddAtHead(list, 1);
+    myLinkedListAddAtHead(list, 10);
+    myLinkedListAddAtHead(list, 11);
+    myLinkedListAddAtTail(list, 3);
+    myLinkedListAddAtIndex(list, 1, 2);
+    idx = 1;
+    val = myLinkedListGet(list, idx);
+    printf("Index[%d]: %d\n", idx, val);
+    myLinkedListDeleteAtIndex(list, 1);
+    idx = 1;
+    val = myLinkedListGet(list, idx);
+    printf("Index[%d]: %d\n", idx, val);
+    
+    myLinkedListFree(list);
+
+    return 0;
+}

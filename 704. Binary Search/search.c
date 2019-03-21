@@ -18,7 +18,51 @@
  * n will be in the range [1, 10000].
  * The value of each element in nums will be in the range [-9999, 9999].
  ******************************************************************************/
+#include <stdio.h>
+#include <stdlib.h>
+
 
 int search(int* nums, int numsSize, int target) {
-    
+	int mid;
+
+	//No any numbers in the list
+	if (numsSize <= 0)
+		return -1;
+
+	mid = numsSize / 2;
+
+	if (target == nums[mid]) {
+		return mid;
+	} else if (target > nums[mid]) {
+        int idx;
+
+		if (mid == numsSize)
+			return -1;
+
+        if ((idx = search(&nums[mid + 1], numsSize - mid + 1, target)) >= 0)
+            return (idx + mid + 1);
+        else
+            return -1;
+	} else if (target < nums[mid]) {
+		if (mid == 0)
+			return -1;
+
+		return search(nums, numsSize - mid, target);
+	}
+
+    return -1;
+}
+
+
+int main ()
+{
+    int input[10] = {-1,1,5,6,8,12,17,20,22,100};
+    int target = 9;
+    int output;
+
+    output = search(input, 10, target);
+
+    printf("idx: %d\n", output);
+
+    return 0;
 }

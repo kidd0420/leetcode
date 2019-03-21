@@ -65,7 +65,7 @@ int minimumLengthEncoding(char** words, int wordsSize) {
     		int stat;
 
     		if (used == count) {
-                sum += strlen(words[j]) + 1;
+                sum += strlen(words[i]) + 1;
     			count++;
     			break;
     		}

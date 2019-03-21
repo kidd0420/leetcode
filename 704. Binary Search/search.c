@@ -34,13 +34,14 @@ int search(int* nums, int numsSize, int target) {
 	if (target == nums[mid]) {
 		return mid;
 	} else if (target > nums[mid]) {
-        int idx;
+        int ret;
+		int start_idx = mid + 1;
 
 		if (mid == numsSize)
 			return -1;
 
-        if ((idx = search(&nums[mid + 1], numsSize - mid + 1, target)) >= 0)
-            return (idx + mid + 1);
+        if ((ret = search(&nums[start_idx], numsSize - start_idx, target)) >= 0)
+            return (ret + start_idx);
         else
             return -1;
 	} else if (target < nums[mid]) {
@@ -57,7 +58,7 @@ int search(int* nums, int numsSize, int target) {
 int main ()
 {
     int input[10] = {-1,1,5,6,8,12,17,20,22,100};
-    int target = 9;
+    int target = 22;
     int output;
 
     output = search(input, 10, target);

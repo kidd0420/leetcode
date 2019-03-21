@@ -77,6 +77,8 @@ int minimumLengthEncoding(char** words, int wordsSize) {
 
     		stat = CompareString(words[i], words[j]);
 
+            //printf("stat: %d\n", stat);
+
     		if (stat == 1) {
     			remove_flag[i] = 1;
                 sum += strlen(words[i]);
@@ -84,8 +86,6 @@ int minimumLengthEncoding(char** words, int wordsSize) {
     			break;
     		} else if (stat == 2) {
     			remove_flag[j] = 1;
-                sum += strlen(words[j]);
-                sum -= strlen(words[i]);
     			break;
     		}
     	}
@@ -102,8 +102,9 @@ int main()
 {
     char **input;
     char input_0[8] = "me";
-    char input_1[8] = "timeg";
+    char input_1[8] = "time";
     char input_2[8] = "bell";
+
     int sum;
 
     input = malloc(sizeof(char**) * 3);

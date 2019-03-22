@@ -33,11 +33,11 @@ int CompareString(char* str_a, char* str_b)
 	int i;
     int min_num = min(len_a, len_b);
 
-    printf("len_a: %d\n", len_a);
-    printf("len_b: %d\n", len_b);
+    //printf("len_a: %d\n", len_a);
+    //printf("len_b: %d\n", len_b);
 
 	for (i = 1; i <= min_num; i++) {
-        printf("i: %d\n", i);
+        //printf("i: %d\n", i);
 		if (str_a[len_a - i] != str_b[len_b - i])
 			return 0;	//String a and b are difference string
 	}
@@ -81,7 +81,7 @@ int minimumLengthEncoding(char** words, int wordsSize) {
 
     		stat = CompareString(words[i], words[j]);
 
-            printf("stat: %d\n", stat);
+            //printf("stat: %d\n", stat);
 
     		if (stat == 1) {
     			remove_flag[j] = 1;

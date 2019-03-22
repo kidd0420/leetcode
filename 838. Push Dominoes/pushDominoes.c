@@ -51,7 +51,7 @@ char* pushDominoes(char* dominoes) {
 	int count_point = 0;
     int count_R = 0;
 
-	for (i = 0; i < dominoes_count; i++) {
+	while (i < dominoes_count) {
         //printf("dominoes[%d]: %c\n", i, dominoes[i]);
 		switch (dominoes[i]) {
 		case '.':
@@ -61,15 +61,17 @@ char* pushDominoes(char* dominoes) {
 			if (count_point) {
 				WriteChar(pushdominoes, &pushdominoes_count, 'L', count_point);
 				count_point = 0;
-			} else if ((i != 0) && (dominoes[i - 1] != 'R') && (pushdominoes[i - 1] == 'R')) {
-                pushdominoes_count -= (count_R / 2);
+			} else if (i != 0) {
+                if ((dominoes[i - 1] != 'R') && (pushdominoes[i - 1] == 'R')) {
+                    pushdominoes_count -= (count_R / 2);
 
-                if (count_R % 2) {
-                    pushdominoes_count--;
-                    WriteChar(pushdominoes, &pushdominoes_count, '.', 1);
+                    if (count_R % 2) {
+                        pushdominoes_count--;
+                        WriteChar(pushdominoes, &pushdominoes_count, '.', 1);
+                    }
+
+                    WriteChar(pushdominoes, &pushdominoes_count, 'L', (count_R / 2));
                 }
-
-				WriteChar(pushdominoes, &pushdominoes_count, 'L', (count_R / 2));
 			}
 
 			WriteChar(pushdominoes, &pushdominoes_count, 'L', 1);
@@ -85,15 +87,21 @@ char* pushDominoes(char* dominoes) {
 			do {
 				WriteChar(pushdominoes, &pushdominoes_count, 'R', 1);
 
-                if (((i + 1) < dominoes_count) && (dominoes[i + 1] == '.')) {
-                    count_R++;
-                    i++;
+                if ((i + 1) < dominoes_count) {
+                    if (dominoes[i + 1] == '.') {
+                        count_R++;
+                        i++;
+                    } else {
+                        break;
+                    }
                 } else {
                     break;
                 }
 			} while (1);
 			break;
 		}
+
+        i++;
 	}
 
 	if (pushdominoes_count < dominoes_count) {

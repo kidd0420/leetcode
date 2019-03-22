@@ -13,7 +13,7 @@
  * Return a string representing the final state. 
  * 
  * Example 1:
- * Input: ".L.R...LR..L.."
+ * Input:  ".L.R...LR..L.."
  * Output: "LL.RR.LLRRLL.."
  * 
  * Example 2:
@@ -25,7 +25,96 @@
  * 0 <= N <= 10^5
  * String dominoes contains only 'L', 'R' and '.'
  ****************************************************************************************************/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+void WriteChar(char* dominoes, int* dominoes_count, char write_char, int count)
+{
+	int i;
+
+	for (i = 0; i < count; i++) {
+		memcpy(&dominoes[(*dominoes_count) + i], &write_char, 1);
+	}
+
+	(*dominoes_count) += count;
+}
+
 
 char* pushDominoes(char* dominoes) {
-    
+	//.L.R...LR..L..
+	int dominoes_count = strlen(dominoes);
+	char* pushdominoes = malloc(sizeof(char) * (dominoes_count + 1));
+	int i;
+	int pushdominoes_count = 0;
+	int count_point = 0;
+    int count_R = 0;
+
+	for (i = 0; i < dominoes_count; i++) {
+        //printf("dominoes[%d]: %c\n", i, dominoes[i]);
+		switch (dominoes[i]) {
+		case '.':
+			count_point++;
+			break;
+		case 'L':
+			if (count_point) {
+				WriteChar(pushdominoes, &pushdominoes_count, 'L', count_point);
+				count_point = 0;
+			} else if ((i != 0) && (dominoes[i - 1] != 'R') && (pushdominoes[i - 1] == 'R')) {
+                pushdominoes_count -= (count_R / 2);
+
+                if (count_R % 2) {
+                    pushdominoes_count--;
+                    WriteChar(pushdominoes, &pushdominoes_count, '.', 1);
+                }
+
+				WriteChar(pushdominoes, &pushdominoes_count, 'L', (count_R / 2));
+			}
+
+			WriteChar(pushdominoes, &pushdominoes_count, 'L', 1);
+			break;
+		case 'R':
+			if (count_point) {
+				WriteChar(pushdominoes, &pushdominoes_count, '.', count_point);
+				count_point = 0;
+			}
+
+            count_R = 0;
+
+			do {
+				WriteChar(pushdominoes, &pushdominoes_count, 'R', 1);
+
+                if (((i + 1) < dominoes_count) && (dominoes[i + 1] == '.')) {
+                    count_R++;
+                    i++;
+                } else {
+                    break;
+                }
+			} while (1);
+			break;
+		}
+	}
+
+	if (pushdominoes_count < dominoes_count) {
+		WriteChar(pushdominoes, &pushdominoes_count, '.', dominoes_count - pushdominoes_count);
+	}
+
+	return pushdominoes;
+}
+
+
+int main ()
+{
+    char* input = "LRRR....LLL...RR.....RR.....LLL...R...L...L";
+    char* output;
+
+    output = pushDominoes(input);
+
+    printf("input  : %s\n", input);
+    printf("output : %s\n", output);
+
+    free(output);
+
+    return 0;
 }

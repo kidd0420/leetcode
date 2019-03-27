@@ -24,7 +24,55 @@
  * 0 <= A.length <= 10000
  * 0 <= A[i] <= 10000
  ******************************************************************************************/
+#include <stdio.h>
+
+#define max(a,b)	(a > b)?a:b
+
 
 int longestMountain(int* A, int ASize) {
+	int ret = 0;
+	int i = 1;
+	int rising_tmp = 1;
+	int falling_tmp = 0;
+
+    while (i < ASize) {
+    	if (A[i] > A[i - 1]) {
+    		if (falling_tmp != 0) {
+    			ret = max(ret, rising_tmp + falling_tmp);
+    			rising_tmp = 1;
+    			falling_tmp = 0;
+    		}
+
+    		rising_tmp++;
+    	} else if ((A[i] < A[i - 1]) && (rising_tmp > 1)) {
+    		falling_tmp++;
+
+            if (i == (ASize - 1))
+                ret = max(ret, rising_tmp + falling_tmp);
+    	} else {
+            if (falling_tmp != 0)
+                ret = max(ret, rising_tmp + falling_tmp);
+
+            rising_tmp = 1;
+    		falling_tmp = 0;
+        }
+
+    	i++;
+    }
+
+    return ret;
+}
+
+
+int main()
+{
+    int input[] = {2,5,8,7,2,2,2,6,7,8,9,8,7,6,2,2,5,5,5,5,5,5,5,2,1};
+    int size = sizeof(input) / sizeof(int);
+    int ret;
     
+    ret = longestMountain(input, size);
+
+    printf("LongestMountain: %d\n", ret);
+
+    return 0;
 }

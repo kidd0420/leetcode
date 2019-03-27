@@ -21,13 +21,34 @@
 //Same as 31. Next Permutation
 
 
-unsigned int convert(char *st) {
-  char *x;
-  for (x = st ; *x ; x++) {
-    if (!isdigit(*x))
-      return 0L;
-  }
-  return (strtoul(st, 0L, 10));
+int isValidNumber(char* string, int len)
+{
+    int i;
+    char max_string[] = {4,2,9,4,9,6,7,2,9,5};
+
+    //4294967295
+    if (len == 10) {
+        for (i = 0; i < 10; i++) {
+            if (string[i] - 0x30 > max_string[i])
+                return 0;
+            else if (string[i] - 0x30 < max_string[i])
+                return 1;
+        }
+    }
+
+    return 1;
+}
+
+
+unsigned int convert(char* st) {
+    char* x;
+
+    for (x = st; *x; x++) {
+        if (!isdigit(*x))
+            return 0L;
+    }
+
+    return (strtoul(st, 0L, 10));
 }
 
 
@@ -68,12 +89,12 @@ void Reorder(char* string, int len, int idx)
 
 
 int nextGreaterElement(int n) {
-  unsigned int tmp = 0;
+    unsigned int tmp = 0;
 	char string[11] = {0};
 	int i;
 	int len;
 
-	if (n > 0x7FFFFFFF)
+	if ((unsigned int)n > 0x7FFFFFFF)
 		return -1;
 
 	sprintf(string, "%d", n);
@@ -83,8 +104,9 @@ int nextGreaterElement(int n) {
 		if (string[i] > string[i - 1]) {
 			Reorder(string, len, i);
 
-			tmp = convert(string);
-      break;
+            if (isValidNumber(string, len))
+			    tmp = convert(string);
+            break;
 		}
 	}
 

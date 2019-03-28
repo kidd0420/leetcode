@@ -112,7 +112,7 @@ int* findClosestElements(int* arr, int arrSize, int k, int x, int* returnSize) {
 	counter--;
 
 	while (counter) {
-		if ((arr[idx_x] - arr[head - 1]) > (arr[tail + 1] - arr[idx_x]))
+		if ((x - arr[head - 1]) > (arr[tail + 1] - x))
 			tail++;
 		else
 			head--;
@@ -138,7 +138,7 @@ int main()
 {
     int input[] = {1,2,3,4,8,9,10,15,20};
     int size = sizeof(input) / sizeof(int);
-    int number = 2;
+    int number = 1;
     int x = 6;
     int* output;
     int ret_len;

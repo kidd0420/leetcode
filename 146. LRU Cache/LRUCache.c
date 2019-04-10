@@ -152,11 +152,11 @@ void lRUCacheAdd(LRUCache* obj, int idx, int key, int value)
 	//Allocate memory for insert data
 	new = malloc(sizeof(HashTable));
 	memset(new, 0, sizeof(HashTable));
-	//printf("new [%x]\n", new);
 
 	//Set key and value
 	new->Index = key;
 	new->Value = value;
+	//printf("new [%x,k%d]\n", new, new->Index);
 	
 	//HeadHT <--- --->Orig 1st HT
 	//	         ^
@@ -179,6 +179,11 @@ void lRUCacheAdd(LRUCache* obj, int idx, int key, int value)
 	//Count used
 	if (obj->UsedCap <= obj->DefinedCap)
 		obj->UsedCap++;
+
+	//printf("HeadHT [%x]\n", HeadHT);
+	//printf("new [%x,k%d]\n", new, new->Index);
+	//printf("new->Next_HT [%x]\n", new->Next_HT);
+	//printf("new->Prev_HT [%x]\n", new->Prev_HT);
 }
 
 void lRUCacheRemove(LRUCache* obj)
@@ -192,7 +197,7 @@ void lRUCacheRemove(LRUCache* obj)
 	if (rm->Next_HT != NULL)
 		rm->Next_HT->Prev_HT = rm->Prev_HT;
 
-	//printf("free [%x]\n", rm);
+	//printf("free [%x,k%d]\n", rm, rm->Index);
 	free(rm);
 }
 
@@ -217,14 +222,18 @@ void lRUCacheRefresh(LRUCache* obj, int idx, HashTable* refresh, int value)
 		HeadHT->Next_HT->Prev_HT = refresh;
 		refresh->Prev_HT->Next_HT = refresh->Next_HT;
 
-		if (refresh->Next_HT != NULL) {
+		if (refresh->Next_HT != NULL)
 			refresh->Next_HT->Prev_HT = refresh->Prev_HT;
-			refresh->Next_HT = HeadHT->Next_HT;
-		}
 
+		refresh->Next_HT = HeadHT->Next_HT;
 		refresh->Prev_HT = HeadHT;
 		HeadHT->Next_HT = refresh;
 	}
+
+	//printf("HeadHT [%x]\n", HeadHT);
+	//printf("refresh [%x,k%d]\n", refresh, refresh->Index);
+	//printf("refresh->Next_HT [%x]\n", refresh->Next_HT);
+	//printf("refresh->Prev_HT [%x]\n", refresh->Prev_HT);
 }
 
 int lRUCacheGet(LRUCache* obj, int key)
@@ -239,6 +248,7 @@ int lRUCacheGet(LRUCache* obj, int key)
 	HT = obj->HeadHT[idx].Next_HT;
 
 	while (1) {
+		//printf("HT: %x\n", HT);
 		if (HT == NULL)
 			return -1;
 
@@ -315,47 +325,30 @@ int main ()
 	LRUCache* cache;
 	int value;
 
-	cache = lRUCacheCreate(2);
+	cache = lRUCacheCreate(1);
 
 	//printf("Define size: %lld\n", cache->DefinedCap);
 	//printf("Set size   : %lld\n", cache->SetCap);
 
-	lRUCachePut(cache, 10, 100);
+	lRUCachePut(cache, 2, 1);
+	lRUCachePut(cache, 3, 2);
 
-	value = lRUCacheGet(cache, 10);
-	printf("Get key 10 value: %d\n", value);
+	value = lRUCacheGet(cache, 3);
+	printf("Get key 3 value: %d\n", value);
 
-	lRUCachePut(cache, 20, 101);
+	value = lRUCacheGet(cache, 2);
+	printf("Get key 2 value: %d\n", value);
 
-	value = lRUCacheGet(cache, 20);
-	printf("Get key 20 value: %d\n", value);
+	lRUCachePut(cache, 4, 3);
 
-	lRUCachePut(cache, 40, 104);
+	value = lRUCacheGet(cache, 2);
+	printf("Get key 2 value: %d\n", value);
 
-	value = lRUCacheGet(cache, 30);
-	printf("Get key 30 value: %d\n", value);
+	value = lRUCacheGet(cache, 3);
+	printf("Get key 3 value: %d\n", value);
 
-	value = lRUCacheGet(cache, 10);
-	printf("Get key 10 value: %d\n", value);
-
-	value = lRUCacheGet(cache, 20);
-	printf("Get key 20 value: %d\n", value);
-
-	lRUCachePut(cache, 20, 1011);
-
-	value = lRUCacheGet(cache, 20);
-	printf("Get key 20 value: %d\n", value);
-
-	lRUCachePut(cache, 23, 10115);
-
-	value = lRUCacheGet(cache, 40);
-	printf("Get key 40 value: %d\n", value);
-
-	value = lRUCacheGet(cache, 20);
-	printf("Get key 20 value: %d\n", value);
-
-	value = lRUCacheGet(cache, 23);
-	printf("Get key 23 value: %d\n", value);
+	value = lRUCacheGet(cache, 4);
+	printf("Get key 4 value: %d\n", value);
 
 	lRUCacheFree(cache);
 

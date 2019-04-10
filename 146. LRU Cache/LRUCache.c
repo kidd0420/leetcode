@@ -29,6 +29,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define DBG_PRINT printf("[%s:%d]\n", __func__, __LINE__);
+
 #define UINT64	unsigned long long int
 #define UINT32 unsigned int
 
@@ -104,6 +106,7 @@ LRUCache* lRUCacheCreate(int capacity)
 		return NULL;
 
 	cache = malloc(sizeof(LRUCache));
+	memset(cache, 0, sizeof(LRUCache));
 
 	cache->DefinedCap = defined_capacity;
 	cache->UsedCap = 0;
@@ -144,21 +147,27 @@ void lRUCacheAdd(LRUCache* obj, int idx, int key, int value)
 	HashTable* HeadHT = &obj->HeadHT[idx];
 	HashTable* new;
 
+	//printf("Add key[%d]\n", key);
+	
 	//Allocate memory for insert data
 	new = malloc(sizeof(HashTable));
+	memset(new, 0, sizeof(HashTable));
+	//printf("new [%x]\n", new);
 
 	//Set key and value
 	new->Index = key;
 	new->Value = value;
+	
 	//HeadHT <--- --->Orig 1st HT
 	//	         ^
 	//	        New
-	if (HeadHT->Next_HT != NULL)
+	if (HeadHT->Next_HT != NULL) {
 		HeadHT->Next_HT->Prev_HT = new;
-	new->Next_HT = HeadHT->Next_HT;
+		new->Next_HT = HeadHT->Next_HT;
+	}
 	new->Prev_HT = HeadHT;
 	HeadHT->Next_HT = new;
-
+	
 	//HeadLRU <--- --->Orig 1st LRU
 	//	          ^
 	//	         New
@@ -166,21 +175,25 @@ void lRUCacheAdd(LRUCache* obj, int idx, int key, int value)
 	new->Prev_LRU = obj->HeadLRU;
 	new->Next_LRU = obj->HeadLRU->Next_LRU;
 	obj->HeadLRU->Next_LRU = new;
-
+	
 	//Count used
-	obj->UsedCap++;
+	if (obj->UsedCap <= obj->DefinedCap)
+		obj->UsedCap++;
 }
 
 void lRUCacheRemove(LRUCache* obj)
 {
-	HashTable* remove = obj->TailLRU->Prev_LRU;
+	HashTable* rm = obj->TailLRU->Prev_LRU;
 
-	remove->Prev_LRU->Next_LRU = obj->TailLRU;
-	obj->TailLRU->Prev_LRU = remove->Prev_LRU;
-	remove->Prev_HT->Next_HT = remove->Next_HT;
-	remove->Next_HT->Prev_HT = remove->Prev_HT;
+	rm->Prev_LRU->Next_LRU = obj->TailLRU;
+	obj->TailLRU->Prev_LRU = rm->Prev_LRU;
+	rm->Prev_HT->Next_HT = rm->Next_HT;
 
-	free(remove);
+	if (rm->Next_HT != NULL)
+		rm->Next_HT->Prev_HT = rm->Prev_HT;
+
+	//printf("free [%x]\n", rm);
+	free(rm);
 }
 
 void lRUCacheRefresh(LRUCache* obj, int idx, HashTable* refresh, int value)
@@ -189,24 +202,41 @@ void lRUCacheRefresh(LRUCache* obj, int idx, HashTable* refresh, int value)
 	HashTable* HeadLRU = obj->HeadLRU;
 
 	refresh->Value = value;
-	refresh->Prev_LRU->Next_LRU = refresh->Next_LRU;
-	refresh->Next_LRU->Prev_LRU = refresh->Prev_LRU;
 
-	HeadHT->Next_HT->Prev_HT = refresh;
-	refresh->Next_HT = HeadHT->Next_HT;
-	refresh->Prev_HT = HeadHT;
-	HeadHT->Next_HT = refresh;
+	if (refresh->Prev_LRU != HeadLRU) {
+		refresh->Prev_LRU->Next_LRU = refresh->Next_LRU;
+		refresh->Next_LRU->Prev_LRU = refresh->Prev_LRU;
 
-	HeadLRU->Next_LRU->Prev_LRU = refresh;
-	refresh->Prev_LRU = HeadLRU;
-	refresh->Next_LRU = HeadLRU->Next_LRU;
-	HeadLRU->Next_LRU = refresh;
+		HeadLRU->Next_LRU->Prev_LRU = refresh;
+		refresh->Prev_LRU = HeadLRU;
+		refresh->Next_LRU = HeadLRU->Next_LRU;
+		HeadLRU->Next_LRU = refresh;
+	}
+
+	if (refresh->Prev_HT != HeadHT) {
+		HeadHT->Next_HT->Prev_HT = refresh;
+		refresh->Prev_HT->Next_HT = refresh->Next_HT;
+
+		if (refresh->Next_HT != NULL) {
+			refresh->Next_HT->Prev_HT = refresh->Prev_HT;
+			refresh->Next_HT = HeadHT->Next_HT;
+		}
+
+		refresh->Prev_HT = HeadHT;
+		HeadHT->Next_HT = refresh;
+	}
 }
 
 int lRUCacheGet(LRUCache* obj, int key)
 {
-	int idx = GetCacheIndex(obj, key);
-	HashTable* HT = obj->HeadHT[idx].Next_HT;
+	int idx;
+	HashTable* HT;
+
+	if (obj == NULL)
+		return -1;
+	
+	idx = GetCacheIndex(obj, key);
+	HT = obj->HeadHT[idx].Next_HT;
 
 	while (1) {
 		if (HT == NULL)
@@ -225,26 +255,30 @@ int lRUCacheGet(LRUCache* obj, int key)
 
 void lRUCachePut(LRUCache* obj, int key, int value)
 {
-	int idx = GetCacheIndex(obj, key);
-	HashTable* HT = obj->HeadHT[idx].Next_HT;
+	int idx;
+	HashTable* HT;
 
-	//printf("idx: %d\n", idx);
+	if (obj == NULL)
+		return;
+
+	idx = GetCacheIndex(obj, key);
+	HT = obj->HeadHT[idx].Next_HT;
 
 	while (1) {
-		if (HT == NULL) {
+		if (HT != NULL) {
+			if (HT->Index == (UINT32)key) {
+				lRUCacheRefresh(obj, idx, HT, value);
+				break;
+			}
+		} else {
 			lRUCacheAdd(obj, idx, key, value);
 
-			if (obj->UsedCap == obj->DefinedCap)
+			if (obj->UsedCap == obj->DefinedCap + 1)
 				lRUCacheRemove(obj);
 
 			break;
 		}
-
-		if (HT->Index == (UINT32)key) {
-			lRUCacheRefresh(obj, idx, HT, value);
-			break;
-		}
-
+			
 		HT = HT->Next_HT;
 	}
 }
@@ -262,6 +296,7 @@ void lRUCacheFree(LRUCache* obj) {
 
 		while (HT != NULL) {
 			Next_HT = HT->Next_HT;
+			//printf("free [%x]\n", HT);
 			free(HT);
 			HT = Next_HT;
 		}
@@ -280,26 +315,47 @@ int main ()
 	LRUCache* cache;
 	int value;
 
-	cache = lRUCacheCreate(11);
+	cache = lRUCacheCreate(2);
 
-	printf("Define size: %lld\n", cache->DefinedCap);
-	printf("Set size   : %lld\n", cache->SetCap);
+	//printf("Define size: %lld\n", cache->DefinedCap);
+	//printf("Set size   : %lld\n", cache->SetCap);
 
 	lRUCachePut(cache, 10, 100);
 
 	value = lRUCacheGet(cache, 10);
-
 	printf("Get key 10 value: %d\n", value);
 
 	lRUCachePut(cache, 20, 101);
 
 	value = lRUCacheGet(cache, 20);
-
 	printf("Get key 20 value: %d\n", value);
 
-	value = lRUCacheGet(cache, 30);
+	lRUCachePut(cache, 40, 104);
 
+	value = lRUCacheGet(cache, 30);
 	printf("Get key 30 value: %d\n", value);
+
+	value = lRUCacheGet(cache, 10);
+	printf("Get key 10 value: %d\n", value);
+
+	value = lRUCacheGet(cache, 20);
+	printf("Get key 20 value: %d\n", value);
+
+	lRUCachePut(cache, 20, 1011);
+
+	value = lRUCacheGet(cache, 20);
+	printf("Get key 20 value: %d\n", value);
+
+	lRUCachePut(cache, 23, 10115);
+
+	value = lRUCacheGet(cache, 40);
+	printf("Get key 40 value: %d\n", value);
+
+	value = lRUCacheGet(cache, 20);
+	printf("Get key 20 value: %d\n", value);
+
+	value = lRUCacheGet(cache, 23);
+	printf("Get key 23 value: %d\n", value);
 
 	lRUCacheFree(cache);
 

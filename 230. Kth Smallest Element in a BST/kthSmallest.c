@@ -54,7 +54,7 @@ int ReturnSmallK(struct TreeNode* root, int* k)
 		return root->val;
 
 	if (root->right != NULL) {
-		if ((ret = ReturnSmallK(root->left, k)) != -1)
+		if ((ret = ReturnSmallK(root->right, k)) != -1)
 			return ret;
 	}
 

@@ -34,6 +34,21 @@ struct Counter {
 };
 
 
+int SetMaxValue(int size, int tmp_max, int count, int k)
+{
+	int a = tmp_max;
+	int b = count;
+
+	if (k > 0)
+		b += k;
+
+	if ((a > size) || (b > size))
+		return size;
+
+	return MAX(a,b);
+}
+
+
 int longestOnes(int* A, int ASize, int K) {
     struct Counter* Head;
 	struct Counter* ptr_c;
@@ -44,48 +59,38 @@ int longestOnes(int* A, int ASize, int K) {
 	Head = malloc(sizeof(struct Counter));
 	memset(Head, 0, sizeof(struct Counter));
     Head->k = K;
-    printf("Head [%x]\n", Head);
     ptr_c = Head;
 
 	while (idx < ASize) {
 		struct Counter* tmp = Head;
 
 		while (tmp != NULL) {
-			printf("Idx%d, tmp [%x]\n", idx, tmp);
 			if (A[idx] == 1) {
                 if (tmp->k >= 0)
 					tmp->count += 1;
 
-				if ((idx != 0) && (A[idx - 1] == 0)) {
+				if ((idx != 0) && (A[idx - 1] == 0) && 
+				    (tmp->next_counter == NULL)) {
 					prev_ptr_c = ptr_c;
 					ptr_c = malloc(sizeof(struct Counter));
 					memset(ptr_c, 0, sizeof(struct Counter));
                     ptr_c->k = K;
                     ptr_c->count = 1;
-                    printf("new [%x]\n", ptr_c);
-                    printf("prev_ptr_c [%x]\n", prev_ptr_c);
 					prev_ptr_c->next_counter = ptr_c;
                     break;
 				}
 			} else {
-                
-
 				if (tmp->k > 0) {
                     tmp->k -= 1;
 					tmp->count += 1;
 				} else {
                     if (tmp->k == 0)
                         tmp->k -= 1;
-                    printf("Head->next_counter [%x]\n", Head->next_counter);
 					if (Head->next_counter != NULL) {
 						struct Counter* tmp_head = Head->next_counter;
-						max = MAX(max, Head->count);
-						printf("free [%x]\n", Head);
-                        printf("free->count: %d\n", Head->count);
-                        printf("free->k: %d\n", Head->k);
+						max = SetMaxValue(ASize, max, Head->count, Head->k);
 						free(Head);
 						Head = tmp_head;
-						printf("Head = Head->next_counter [%x]\n", Head);
 						tmp = Head;
 						continue;
 					}
@@ -100,15 +105,8 @@ int longestOnes(int* A, int ASize, int K) {
 
 	while(Head != NULL) {
 		struct Counter* tmp_head = Head;
-        printf("Head [%x]\n", Head);
-        printf("Head->count: %d\n", Head->count);
-        printf("Head->k: %d\n", Head->k);
-        if (Head->k > 0)
-		    max = MAX(max, Head->count + Head->k);
-        else
-            max = MAX(max, Head->count);
+		max = SetMaxValue(ASize, max, Head->count, Head->k);
         Head = Head->next_counter;
-        printf("free1 [%x]\n", tmp_head);
 		free(tmp_head);
 	}
 
@@ -117,9 +115,9 @@ int longestOnes(int* A, int ASize, int K) {
 
 int main()
 {
-    int inputA[] = {0,0,0,1,0,1,0,1,1,0,1,1,1,1,0,0};
+    int inputA[] = {1,0,1,0,0,1,1,1,1,0,1,0};
     int sizeA = sizeof(inputA) / sizeof(int);
-    int k = 2;
+    int k = 1;
     int max;
 
     max = longestOnes(inputA, sizeA, k);

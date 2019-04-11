@@ -25,7 +25,106 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX(a,b)	(a > b)?a:b
+
+struct Counter {
+	int count;
+	int k;
+	struct Counter* next_counter;
+};
+
 
 int longestOnes(int* A, int ASize, int K) {
-    
+    struct Counter* Head;
+	struct Counter* ptr_c;
+	struct Counter* prev_ptr_c;
+	int idx = 0;
+	int max = 0;
+
+	Head = malloc(sizeof(struct Counter));
+	memset(Head, 0, sizeof(struct Counter));
+    Head->k = K;
+    printf("Head [%x]\n", Head);
+    ptr_c = Head;
+
+	while (idx < ASize) {
+		struct Counter* tmp = Head;
+
+		while (tmp != NULL) {
+			printf("Idx%d, tmp [%x]\n", idx, tmp);
+			if (A[idx] == 1) {
+                if (tmp->k >= 0)
+					tmp->count += 1;
+
+				if ((idx != 0) && (A[idx - 1] == 0)) {
+					prev_ptr_c = ptr_c;
+					ptr_c = malloc(sizeof(struct Counter));
+					memset(ptr_c, 0, sizeof(struct Counter));
+                    ptr_c->k = K;
+                    ptr_c->count = 1;
+                    printf("new [%x]\n", ptr_c);
+                    printf("prev_ptr_c [%x]\n", prev_ptr_c);
+					prev_ptr_c->next_counter = ptr_c;
+                    break;
+				}
+			} else {
+                
+
+				if (tmp->k > 0) {
+                    tmp->k -= 1;
+					tmp->count += 1;
+				} else {
+                    if (tmp->k == 0)
+                        tmp->k -= 1;
+                    printf("Head->next_counter [%x]\n", Head->next_counter);
+					if (Head->next_counter != NULL) {
+						struct Counter* tmp_head = Head->next_counter;
+						max = MAX(max, Head->count);
+						printf("free [%x]\n", Head);
+                        printf("free->count: %d\n", Head->count);
+                        printf("free->k: %d\n", Head->k);
+						free(Head);
+						Head = tmp_head;
+						printf("Head = Head->next_counter [%x]\n", Head);
+						tmp = Head;
+						continue;
+					}
+				}
+			}
+
+			tmp = tmp->next_counter;
+		}
+
+		idx++;
+	}
+
+	while(Head != NULL) {
+		struct Counter* tmp_head = Head;
+        printf("Head [%x]\n", Head);
+        printf("Head->count: %d\n", Head->count);
+        printf("Head->k: %d\n", Head->k);
+        if (Head->k > 0)
+		    max = MAX(max, Head->count + Head->k);
+        else
+            max = MAX(max, Head->count);
+        Head = Head->next_counter;
+        printf("free1 [%x]\n", tmp_head);
+		free(tmp_head);
+	}
+
+	return max;
+}
+
+int main()
+{
+    int inputA[] = {0,0,0,1,0,1,0,1,1,0,1,1,1,1,0,0};
+    int sizeA = sizeof(inputA) / sizeof(int);
+    int k = 2;
+    int max;
+
+    max = longestOnes(inputA, sizeA, k);
+
+    printf("max: %d\n", max);
+
+    return 0;
 }
